@@ -7,10 +7,11 @@ class Strip:
                                 otherfd = open("other.mp3",'w')                                
                                 byte = f.read(1)
                                 while byte !="":
-                                    part = f.read(1)
-                                    otherfd.write(part)
-                    f.close()
-                    otherfd.close()
+                                    byte = f.read(1)
+                                    otherfd.write(byte)
+                                f.close()
+                                otherfd.close()
+
 if __name__ == "__main__":    
     strip = Strip()
     myfile="myfile"

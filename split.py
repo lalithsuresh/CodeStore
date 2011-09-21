@@ -5,17 +5,41 @@ import copy
 import distribute
 
 class MetaStore:
-      meta_map = {}
+
+      def __init__ (self):
+          self.meta_map = {}
       
+      def AddObject (self, storage_object, node_index, object_index):
+          
+          if (not self.meta_map.has_key (storage_object.get_base_name())):
+              self.meta_map [storage_object.get_base_name()] = {}
+
+              for i in range(0, len(conf.DIRS)):
+                  self.meta_map [storage_object.get_base_name()][i] = {}
+
+          print node_index, object_index
+          self.meta_map[storage_object.get_base_name()][node_index][object_index] = []
+
+          for element in storage_object.get_data_map():
+              self.meta_map[storage_object.get_base_name()][node_index][object_index].append (element)
+              self.meta_map[storage_object.get_base_name()][node_index][object_index].append (len(storage_object.get_data_map()[element]))
+
+
+      def Print(self):
+          print self.meta_map
 
 class StorageObject:
 
-      def __init__ (self, data, index):
+      def __init__ (self, data, index, name):
           self.data_map = {}
           self.data_map[index] = data
+          self.base_name = name
 
       def get_data_map (self):
           return self.data_map
+
+      def get_base_name (self):
+          return self.base_name
 
       # This method follows XOR semantics
       def AddObject (self, new_obj):
@@ -77,6 +101,9 @@ def ApplyBasisVectors (storage_obj_list):
                         obj.AddObject (copy.deepcopy (storage_obj_list [i]))
                         
             obj_list.append (obj)
+            
+            meta.AddObject (copy.deepcopy(obj),conf.BASIS_VECTORS.index (node), node.index(vector))
+
             del obj
         final_list.append (obj_list)
 
@@ -84,6 +111,7 @@ def ApplyBasisVectors (storage_obj_list):
 
 if __name__ == "__main__":    
 
+    global meta
     meta = MetaStore ()
 
     strip = Strip()
@@ -93,8 +121,9 @@ if __name__ == "__main__":
     i = 0
     storage_obj_list = []
     for each in li:
-        so = StorageObject (each, i)
+        so = StorageObject (each, i, "Test.mp3")
         storage_obj_list.append (so)
         i += 1
 
     final_list = ApplyBasisVectors (storage_obj_list)
+    meta.Print()

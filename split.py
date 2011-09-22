@@ -148,6 +148,35 @@ def Reconstruct (list_of_nodes, name):
     outfile.close()
 
 
+def Regenerate (failed_node, list_of_nodes, name):
+    
+    list_of_vects = []
+
+    for node_index in list_of_nodes:
+        list_of_vects = list_of_vects + (map(lambda x: list(x), list(conf.BASIS_VECTORS [node_index])))
+
+    array_A = numpy.array(list_of_vects).transpose()
+    arrays_B = []
+
+    arrays_B = map(lambda x: list(x), list(conf.BASIS_VECTORS [failed_node]))
+
+    obj_list = []
+
+    for node_index in list_of_nodes:
+        for object_index in range(0,conf.PART_SIZE):
+           obj_list.append (dist.pull_object_from_stores (name, node_index, object_index))
+
+    for each in arrays_B:
+        parts_to_pull = numpy.linalg.solve (array_A, numpy.array(each).transpose())
+        pack = []
+        
+        for i in range(0,len(parts_to_pull)):
+            if (parts_to_pull[i] != 0):
+                pack.append (copy.deepcopy (obj_list[i]))
+
+        dist.push_object_to_store (name, failed_node, reduce (numpy.bitwise_xor, pack), arrays_B.index (each))
+
+
 if __name__ == "__main__":    
 
     global meta
@@ -171,15 +200,16 @@ if __name__ == "__main__":
     # Write out data
     global dist
     dist = distribute.Distributor ()
-    dist.create_dirs ()
-    dist.push_objects_to_stores (name, final_list)
-
-    
-    Reconstruct ([0,1], name)
-
 
     # TEST CASES
     """
+    #dist.create_dirs ()
+    #dist.push_objects_to_stores (name, final_list)
+
+    
+    Reconstruct ([0,1], name)
+    Regenerate (4, [0,2], name)
+
     o1 = dist.pull_object_from_stores (name, 0, 0)
     o2 = dist.pull_object_from_stores (name, 1, 0)
     o2o3 = dist.pull_object_from_stores (name, 0, 1)

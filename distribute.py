@@ -38,6 +38,20 @@ class Distributor:
 
             i += 1
 
+    def push_object_to_store(self, name, node_index, obj, object_index):
+
+        path = os.path.abspath(conf.DIRS[node_index])
+
+        # For each tuple to be saved...
+        outfile = open(os.path.join(path, name + '-' + str(object_index)), 'wb')
+
+        # Write out each byte as in
+        # original file
+        for byte in obj:
+            outfile.write (chr(byte))
+
+        outfile.close()
+
     def pull_object_from_stores(self, name, node_index, object_index):
         
         path = os.path.abspath (conf.DIRS[node_index])

@@ -115,6 +115,38 @@ def SplitIntoChunks (narray):
 
     return chunks
 
+# TODO: Should probably check if nodes are up
+# before computing inverse
+def Reconstruct (list_of_nodes, name):
+
+    list_of_vects = []
+    # Find inverse
+    for node_index in list_of_nodes:
+        list_of_vects = list_of_vects + (map(lambda x: list(x), list(conf.BASIS_VECTORS [node_index])))
+
+    inverted_matrix = numpy.linalg.inv (list_of_vects)
+    
+    # Assuming reconstruction from 2 nodes, we
+    # fetch all objects, and then go through
+    # the inverted matrix and put them together
+    obj_list = []
+
+    for node_index in list_of_nodes:
+        for object_index in range(0,conf.PART_SIZE):
+           obj_list.append (dist.pull_object_from_stores (name, node_index, object_index))
+
+    outfile = open ('reconstructed-output.mp3', 'wb')
+
+    for row in inverted_matrix:
+        pack = []
+        for i in range(0,len(row)):
+            if (row[i] != 0):
+                pack.append (copy.deepcopy (obj_list[i]))
+        for byte in reduce (numpy.bitwise_xor, pack):
+            outfile.write (chr(byte))
+    
+    outfile.close()
+
 
 if __name__ == "__main__":    
 
@@ -135,16 +167,15 @@ if __name__ == "__main__":
         i += 1
 
     final_list = ApplyBasisVectors (storage_obj_list)
-    meta.Print()
-
 
     # Write out data
+    global dist
     dist = distribute.Distributor ()
     dist.create_dirs ()
     dist.push_objects_to_stores (name, final_list)
 
     
-    
+    Reconstruct ([0,1], name)
 
 
     # TEST CASES

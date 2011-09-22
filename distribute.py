@@ -31,7 +31,6 @@ class Distributor:
 
                 # Write out each byte as in
                 # original file
-                print obj.get_data()
                 for byte in obj.get_data():
                     outfile.write (chr(byte))
 

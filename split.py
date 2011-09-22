@@ -144,11 +144,17 @@ if __name__ == "__main__":
     dist.push_objects_to_stores (name, final_list)
 
     
+    
+
+
+    # TEST CASES
+    """
     o1 = dist.pull_object_from_stores (name, 0, 0)
     o2 = dist.pull_object_from_stores (name, 1, 0)
-    o3 = dist.pull_object_from_stores (name, 2, 0)
+    o2o3 = dist.pull_object_from_stores (name, 0, 1)
     o4 = dist.pull_object_from_stores (name, 3, 0)
 
+    o3 = numpy.bitwise_xor (o2, o2o3)
     EATME = numpy.append(numpy.append(numpy.append (o1, o2), o3), o4)
     print EATME
 
@@ -158,3 +164,4 @@ if __name__ == "__main__":
         testfile.write (chr(byte))
 
     testfile.close()
+    """

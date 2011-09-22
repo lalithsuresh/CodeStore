@@ -1,7 +1,7 @@
 import conf
 import os
 import errno
-import struct
+import numpy
 
 class Distributor:
     """Given a list of objects, this class distributes them and/or retrieves them"""
@@ -17,41 +17,49 @@ class Distributor:
 
     def push_objects_to_stores(self, name, list_of_objects):
         i = 0
+
+        # Because this is a list of tuples to be saved
+        # in different nodes
         assert len(list_of_objects) == len(conf.DIRS)
 
         for element in map(lambda x: os.path.abspath(x), conf.DIRS):
             assert(len(list_of_objects[i])) == conf.PART_SIZE
-            outfile = open(os.path.join(element, name + str(i)), 'wb')
 
+            # For each tuple to be saved...
             for obj in list_of_objects[i]:
-                for key in obj.get_data_map():
-                    outfile.write (struct.pack ('II'+str(len(obj.get_data_map[key]))+'s', [key, len(obj.get_data_map[key]), obj.get_data_map[key]]))
+                outfile = open(os.path.join(element, name + '-' + str(list_of_objects[i].index (obj))), 'wb')
 
-            outfile.close()
+                # Write out each byte as in
+                # original file
+                print obj.get_data()
+                for byte in obj.get_data():
+                    outfile.write (chr(byte))
+
+                outfile.close()
+
             i += 1
 
-    def pull_objects_from_stores(self, name, num):
-        list_of_objects=[]
-        i = 0
-        success = 0
-        for element in map(lambda x: os.path.abspath(x), conf.DIRS):
-            try:
-                infile = open(os.path.join(element, name + str(i)), 'rb')
-            except IOError:
-                print "Error opening %s" % (infile.name)
-                continue
-            finally:
-                i += 1
-            line = infile.readlines()
-            list_of_objects.append(list(struct.unpack('I' * conf.PART_SIZE, line[0].strip())))
-            success += 1
-            if (success == num):
-                break
+    def pull_object_from_stores(self, name, node_index, object_index):
+        
+        path = os.path.abspath (conf.DIRS[node_index])
+        data = []
 
-        if (num > len(list_of_objects)):
-            print 'Could not retrieve objects from %s nodes' % (num)
-            raise Exception (num)
-        return list_of_objects
+        try:
+            infile = open(os.path.join(path, name + '-' + str(object_index)),'rb')
+            byte = infile.read (1)
+            data = [byte]
+    
+            while byte != "":
+                byte = infile.read (1)
+                data.append (byte)
+
+        except IOError:
+            print "Error opening %s" % (os.path.join(path, name + str(object_index)))
+
+        arr = numpy.array (map(lambda x: ord(x), data[:-1]))
+        return arr
+
+
 
 if __name__ == "__main__":
     dist = Distributer()

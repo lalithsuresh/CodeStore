@@ -63,13 +63,14 @@ class Strip:
     """ A class that strips the file into 4 binary pieces"""
     def splitter(self,filename):
         with open(filename, "rb") as f:
-            byte = f.read(1)
-            data = [byte]
-            while byte !="":
-                byte = f.read(1)
-                data.append (byte)
-            #print data[:-1]
-            arr = numpy.array (map(lambda x: ord(x), data[:-1]))
+            bytes_read = f.read(256)
+            data = []
+            while bytes_read !="":
+                for b in bytes_read:
+                    data.append (ord(b))
+                bytes_read = f.read(256)
+            arr = numpy.array (data)
+            print arr
             return arr
 
 def ApplyBasisVectors (storage_obj_list):
@@ -201,8 +202,7 @@ if __name__ == "__main__":
     global dist
     dist = distribute.Distributor ()
 
-    # TEST CASES
-    """
+    ## TEST CASES
     #dist.create_dirs ()
     #dist.push_objects_to_stores (name, final_list)
 
@@ -210,6 +210,7 @@ if __name__ == "__main__":
     Reconstruct ([0,1], name)
     Regenerate (4, [0,2], name)
 
+    """
     o1 = dist.pull_object_from_stores (name, 0, 0)
     o2 = dist.pull_object_from_stores (name, 1, 0)
     o2o3 = dist.pull_object_from_stores (name, 0, 1)

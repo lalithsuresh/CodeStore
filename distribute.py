@@ -59,12 +59,13 @@ class Distributor:
 
         try:
             infile = open(os.path.join(path, name + '-' + str(object_index)),'rb')
-            byte = infile.read (1)
-            data = [byte]
+            bytes_read = infile.read (256)
+            data = []
     
-            while byte != "":
-                byte = infile.read (1)
-                data.append (byte)
+            while bytes_read != "":
+                for b in bytes_read:
+                    data.append (b)
+                bytes_read = infile.read (256)
 
         except IOError:
             print "Error opening %s" % (os.path.join(path, name + str(object_index)))

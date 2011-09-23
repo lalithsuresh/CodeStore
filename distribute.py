@@ -70,7 +70,7 @@ class Distributor:
         except IOError:
             print "Error opening %s" % (os.path.join(path, name + str(object_index)))
 
-        arr = numpy.array (map(lambda x: ord(x), data[:-1]))
+        arr = numpy.array (map(lambda x: ord(x), data))
         return arr
 
 

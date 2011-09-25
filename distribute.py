@@ -25,7 +25,6 @@ class Distributor:
 
         for element in map(lambda x: os.path.abspath(x), conf.DIRS):
             assert(len(list_of_objects[i])) == conf.PART_SIZE
-
             # For each tuple to be saved...
             for obj in list_of_objects[i]:
                 outfile = open(os.path.join(element, name + '-' + str(list_of_objects[i].index (obj))), 'wb')

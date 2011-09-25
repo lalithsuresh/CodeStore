@@ -1,14 +1,15 @@
 import threading
 import os
-
+import split
 import conf
 
 class Monitoring:
 
-    def __init__ (self):
+    def __init__ (self, regen):
         self.information_map = {}
         self.timer = ""
         self.has_started = False
+        self.reg =regen
 
     def scan (self, list_of_nodes=conf.DIRS):
         for node in list_of_nodes:
@@ -16,7 +17,12 @@ class Monitoring:
                 self.information_map[os.path.abspath(node)] = "UP"
             else:
                 self.information_map[os.path.abspath(node)] = "DOWN"
-        self.stats()
+                print "monitor"
+                print self.reg.regen_from
+                print self.reg.name
+                print node
+                split.Regenerate ( int(node), self.reg.regen_from, self.reg.name) 
+#        self.stats()
         self.timer = threading.Timer (conf.MONITORING_INTERVAL, self.scan)
         self.timer.start()
 

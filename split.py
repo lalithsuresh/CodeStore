@@ -70,7 +70,6 @@ class Strip:
                     data.append (ord(b))
                 bytes_read = f.read(256)
             arr = numpy.array (data)
-            print arr
             return arr
 
 def ApplyBasisVectors (storage_obj_list):
@@ -149,7 +148,7 @@ def Reconstruct (list_of_nodes, name):
     outfile.close()
 
 
-def Regenerate (failed_node, list_of_nodes, name):
+def RegenerateWith2Nodes (failed_node, list_of_nodes, name):
     
     list_of_vects = []
 
@@ -176,6 +175,74 @@ def Regenerate (failed_node, list_of_nodes, name):
                 pack.append (copy.deepcopy (obj_list[i]))
 
         dist.push_object_to_store (name, failed_node, reduce (numpy.bitwise_xor, pack), arrays_B.index (each))
+
+def RegenerateWith3Nodes (failed_node, list_of_nodes, name):
+
+    # Obtain index of an object which isn't
+    # required to repair the failed node
+    basis_vectors_of_failed_node = conf.BASIS_VECTORS [failed_node]
+    ored_vect = reduce (numpy.bitwise_or, basis_vectors_of_failed_node)
+    if (list(ored_vect).count (0) == 1):
+        pos = list(ored_vect).index (0)
+    else:
+        # fallback
+        raise
+
+    #
+    # Store basis vectors indexed by nodeId and objectId.
+    # We eliminate basis vectors which have a bit set for
+    # an object which isn't required to repair the failed_node.
+    #
+    list_of_basis_vectors = {}
+    for node_index in list_of_nodes:
+        bv_of_node = map(lambda x: list(x), list(conf.BASIS_VECTORS [node_index]))
+        list_of_basis_vectors [node_index] = {}
+        for bv in bv_of_node:
+            if (bv[pos] != 1):
+                list_of_basis_vectors [node_index][bv_of_node.index(bv)] = bv
+
+    array_A = []
+    # Remove rows which have 0 at 'pos' position
+    # If not, raise exception
+    for node_index in list_of_basis_vectors:
+        for object_index in list_of_basis_vectors[node_index]:
+            obj_vect = list_of_basis_vectors[node_index][object_index]
+            if (obj_vect[pos] == 0):
+                list_of_basis_vectors[node_index][object_index] = obj_vect[:pos] + obj_vect[pos+1:]
+                array_A.append (list_of_basis_vectors[node_index][object_index])
+            else:
+                # fallback
+                raise
+
+    list_of_objects = []
+    # Pull from repository
+    for node_index in list_of_basis_vectors:
+        for object_index in list_of_basis_vectors[node_index]:
+            list_of_objects.append (dist.pull_object_from_stores (name, node_index, object_index))
+    
+    # Now we have the reduced matrix (3x3 for this case)
+    # SOLVE!
+    for tup in basis_vectors_of_failed_node:
+        each = tup[:pos] + tup[pos+1:]
+        res = numpy.linalg.solve (numpy.array(array_A).transpose(), numpy.array(each).transpose())
+
+        pack = []
+
+        for i in range (0, len(res)):
+            if (res[i] != 0):
+                pack.append (copy.deepcopy (list_of_objects[i]))
+
+        dist.push_object_to_store (name, failed_node, reduce (numpy.bitwise_xor, pack), basis_vectors_of_failed_node.index (tup))
+
+def Regenerate (failed_node, list_of_nodes, name):
+    if (len(list_of_nodes) == 2):
+        RegenerateWith2Nodes (failed_node, list_of_nodes, name)
+    elif (len(list_of_nodes) == 3):
+        try:
+            RegenerateWith3Nodes (failed_node, list_of_nodes, name)
+        except:
+            print "Falling back to 2 nodes"
+            RegenerateWith2Nodes (failed_node, list_of_nodes[:-1], name)
 
 
 if __name__ == "__main__":    
@@ -206,9 +273,8 @@ if __name__ == "__main__":
     #dist.create_dirs ()
     #dist.push_objects_to_stores (name, final_list)
 
-    
-    Reconstruct ([0,1], name)
-    Regenerate (4, [0,2], name)
+    Regenerate (3, [0,1,4], name)
+    Reconstruct ([3,2], name)
 
     """
     o1 = dist.pull_object_from_stores (name, 0, 0)

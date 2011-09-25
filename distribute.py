@@ -68,7 +68,7 @@ class Distributor:
                 bytes_read = infile.read (256)
 
         except IOError:
-            print "Error opening %s" % (os.path.join(path, name + str(object_index)))
+            print "Error opening %s" % (os.path.join(path, name + '-' + str(object_index)))
 
         arr = numpy.array (map(lambda x: ord(x), data))
         return arr

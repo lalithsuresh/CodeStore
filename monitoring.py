@@ -24,7 +24,7 @@ class Monitoring:
                 except OSError, e:
                     if e.errno != errno.EEXIST:
                         raise
-                split.Regenerate (int(node), self.reg.regen_from, self.reg.name)
+                split.Regenerate (list_of_nodes.index (node), self.reg.regen_from, self.reg.name)
         self.timer = threading.Timer (conf.MONITORING_INTERVAL, self.scan)
         self.timer.start()
 

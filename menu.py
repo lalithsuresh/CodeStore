@@ -36,7 +36,7 @@ class Menu(cmd.Cmd):
        else :
            reg_inst.regen_from = list_of_nodes
            reg_inst.name = name
-           shutil.rmtree(str(failed_node)) #TODO  copy dir struct from do_clean
+           shutil.rmtree(str(conf.DIRS[failed_node])) #TODO  copy dir struct from do_clean
             
 
 

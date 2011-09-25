@@ -110,6 +110,7 @@ def Reconstruct (list_of_nodes, name):
 def RegenerateWith2Nodes (failed_node, list_of_nodes, name):
     """Regenerate a node using parts obtained from 2 nodes"""
     
+    print failed_node, list_of_nodes, name
     list_of_vects = []
 
     for node_index in list_of_nodes:

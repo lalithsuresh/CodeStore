@@ -1,9 +1,29 @@
+CodeStore
+---------
+
+A peer-2-peer object store based on self-repairing codes (SRC).
+
+It works with a central master server that takes an object
+and distributes it across a set of peers by splitting the
+object into multiple parts using the SRC.
+
+In its current form, peers are local directories and the basis
+vectors for the SRC are to be fed as a configuration parameter.
+It has been tested against a (5,2) PSRC code for now. Hopefully,
+the same code works with other codes as well. :)
+
+
+Running the code
+----------------
+
+$: ./split.py <file-to-be-split>
+
+
 TODO
 ----
-
-- Explore XOR stuff <--- lot of refactoring involved?
-- Regeneration of lost nodes
-- Recreating object from parts
+- Support remote peers.
+- Peers should talk to each other for node repair.
+- Support joining of a new node.
 
 
 Credits

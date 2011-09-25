@@ -1,7 +1,8 @@
-import conf
 import os
 import errno
 import numpy
+
+import conf
 
 class Distributor:
     """Given a list of objects, this class distributes them and/or retrieves them"""

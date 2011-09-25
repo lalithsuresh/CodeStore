@@ -8,7 +8,10 @@ import meta_store
 import distribute
 import storage_object
 
-class Strip:
+global dist
+dist = distribute.Distributor()
+
+class Split:
     """ A class that strips the file into 4 binary pieces"""
     def splitter(self,filename):
         with open(filename, "rb") as f:
@@ -41,7 +44,7 @@ def ApplyBasisVectors (storage_obj_list):
             obj_list.append (obj)
             
             # Store (Object, NodeIndex, ObjectPartIndex) to MetaMap
-            meta.AddObject (copy.deepcopy(obj),conf.BASIS_VECTORS.index (node), node.index(vector))
+            #meta.AddObject (copy.deepcopy(obj),conf.BASIS_VECTORS.index (node), node.index(vector))
 
             del obj
         final_list.append (obj_list)
@@ -72,7 +75,7 @@ def Reconstruct (list_of_nodes, name):
         list of nodes provided. Requires
         at least two nodes.
     """
-
+    
     list_of_vects = []
     # Find inverse
     for node_index in list_of_nodes:
@@ -223,9 +226,9 @@ if __name__ == "__main__":
     global meta
     meta = meta_store.MetaStore ()
 
-    strip = Strip()
+    split = Split()
     name = sys.argv[1]
-    byte_array = strip.splitter(name)
+    byte_array = split.splitter(name)
     chunks = SplitIntoChunks (byte_array)
 
     # Number of chunks == number of indices

@@ -8,7 +8,6 @@ import os
 import monitoring
 class Menu(cmd.Cmd):
    #TODO: 
-   #crash_node : remove dir
    #stats
    # play
     def do_reconstruct (self,line):
@@ -16,7 +15,6 @@ class Menu(cmd.Cmd):
         list_args = line.split()
         name = list_args[0]
         list_of_nodes= map(lambda x: int(x),list_args[1:])
-        print list_of_nodes
         if (len(list_of_nodes) == 2):
             split.Reconstruct(list_of_nodes, name)
         else:
@@ -29,7 +27,6 @@ class Menu(cmd.Cmd):
        name = list_of_args[0]
        failed_node = int(list_of_args[1])
        list_of_nodes= map(lambda x: int(x),list_of_args[2:])
-       print failed_node, list_of_nodes
        
        if  failed_node in list_of_nodes:
            print "Failed node should be different from list of nodes"
@@ -38,7 +35,6 @@ class Menu(cmd.Cmd):
            reg_inst.name = name
            shutil.rmtree(str(conf.DIRS[failed_node])) #TODO  copy dir struct from do_clean
             
-
 
     def do_init(self,name):
         """ init name 
@@ -58,15 +54,14 @@ class Menu(cmd.Cmd):
         Clean all dirs and data"""
         for d in conf.DIRS:
             for f in os.listdir(d):
-                print f[:len(name)], name
                 if (f[:len(name)] == name):
                     os.remove(d + '/'+ f)
         if (os.path.isfile("reconstructed-output.mp3")):
             os.remove('reconstructed-output.mp3') 
 
-    def do_stats (self):
+    def do_stats (self,line):
         """ Shows status (UP/DOWN) about the diff nodes"""
-        mon_inst.stats()
+        monitor.stats()
 
     def emptyline(self):
             pass

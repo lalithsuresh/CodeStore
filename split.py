@@ -2,11 +2,13 @@ import struct
 import numpy
 import copy
 import sys
+import os
 
 import conf
 import meta_store
 import distribute
 import storage_object
+import monitoring
 
 class Strip:
     """ A class that strips the file into 4 binary pieces"""
@@ -243,11 +245,14 @@ if __name__ == "__main__":
     dist = distribute.Distributor ()
 
     ## TEST CASES
-    #dist.create_dirs ()
-    #dist.push_objects_to_stores (name, final_list)
+    dist.create_dirs ()
+    dist.push_objects_to_stores (name, final_list)
 
-    Regenerate (3, [0,1,4], name)
-    Reconstruct ([3,2], name)
+    monitor = monitoring.Monitoring()
+    monitor.start()
+
+    #Regenerate (3, [0,1,4], name)
+    #Reconstruct ([3,2], name)
 
     """
     o1 = dist.pull_object_from_stores (name, 0, 0)

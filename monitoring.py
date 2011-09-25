@@ -16,7 +16,6 @@ class Monitoring:
                 self.information_map[os.path.abspath(node)] = "UP"
             else:
                 self.information_map[os.path.abspath(node)] = "DOWN"
-        self.stats()
         self.timer = threading.Timer (conf.MONITORING_INTERVAL, self.scan)
         self.timer.start()
 

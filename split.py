@@ -224,7 +224,7 @@ def Regenerate (failed_node, list_of_nodes, name):
 
 
 if __name__ == "__main__":    
-
+    """
     global meta
     meta = meta_store.MetaStore ()
 
@@ -257,7 +257,6 @@ if __name__ == "__main__":
     #Regenerate (3, [0,1,4], name)
     #Reconstruct ([3,2], name)
 
-    """
     o1 = dist.pull_object_from_stores (name, 0, 0)
     o2 = dist.pull_object_from_stores (name, 1, 0)
     o2o3 = dist.pull_object_from_stores (name, 0, 1)

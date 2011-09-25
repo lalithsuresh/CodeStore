@@ -7,9 +7,9 @@ import conf
 class Distributor:
     """Given a list of objects, this class distributes them and/or retrieves them"""
 
-    def create_dirs(self):
+    def create_dirs(self,dirs=conf.DIRS):
         current_dir = os.getcwd()
-        for path in conf.DIRS:
+        for path in dirs:
             try:
                 os.makedirs(os.path.abspath(path))
             except OSError, e:

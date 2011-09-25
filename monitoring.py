@@ -2,6 +2,8 @@ import threading
 import os
 import split
 import conf
+import distribute
+import errno
 
 class Monitoring:
 
@@ -17,12 +19,12 @@ class Monitoring:
                 self.information_map[os.path.abspath(node)] = "UP"
             else:
                 self.information_map[os.path.abspath(node)] = "DOWN"
-                print "monitor"
-                print self.reg.regen_from
-                print self.reg.name
-                print node
-                split.Regenerate ( int(node), self.reg.regen_from, self.reg.name) 
-#        self.stats()
+                try:
+                    os.makedirs(os.path.abspath(node))
+                except OSError, e:
+                    if e.errno != errno.EEXIST:
+                        raise
+                split.Regenerate (int(node), self.reg.regen_from, self.reg.name)
         self.timer = threading.Timer (conf.MONITORING_INTERVAL, self.scan)
         self.timer.start()
 

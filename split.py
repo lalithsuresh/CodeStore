@@ -213,6 +213,7 @@ def Regenerate (failed_node, list_of_nodes, name):
         the special case of the missing bit, then
         fallback to 2-node repair
     """
+    print failed_node,list_of_nodes,name
     if (len(list_of_nodes) == 2):
         RegenerateWith2Nodes (failed_node, list_of_nodes, name)
     elif (len(list_of_nodes) == 3):
@@ -224,7 +225,7 @@ def Regenerate (failed_node, list_of_nodes, name):
 
 
 if __name__ == "__main__":    
-
+    """
     global meta
     meta = meta_store.MetaStore ()
 
@@ -257,7 +258,6 @@ if __name__ == "__main__":
     #Regenerate (3, [0,1,4], name)
     #Reconstruct ([3,2], name)
 
-    """
     o1 = dist.pull_object_from_stores (name, 0, 0)
     o2 = dist.pull_object_from_stores (name, 1, 0)
     o2o3 = dist.pull_object_from_stores (name, 0, 1)

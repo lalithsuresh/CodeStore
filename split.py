@@ -3,37 +3,10 @@ import numpy
 import copy
 import sys
 
-import metastore
 import conf
+import meta_store
 import distribute
-
-class StorageObject:
-
-      def __init__ (self, data, index, name):
-          self.indices = {index: len (data)} # Part-indices and corresponding size
-          self.data = data  # XOR-ed data
-          self.base_name = name
-
-      def get_data (self):
-          return self.data
-
-      def get_indices (self):
-          return self.indices
-
-      def get_base_name (self):
-          return self.base_name
-
-      def AddObject (self, new_so):
-          self.data = numpy.bitwise_xor (self.data, new_so.get_data())
-
-          for key in new_so.get_indices ():
-              if (self.indices.has_key (key)):
-                  del self.indices [key]
-              else:
-                  self.indices[key] = new_so.get_indices()[key]
-
-      def Print (self):
-          print self.indices, self.data
+import storage_object
 
 class Strip:
     """ A class that strips the file into 4 binary pieces"""
@@ -91,9 +64,14 @@ def SplitIntoChunks (narray):
 
     return chunks
 
+
 # TODO: Should probably check if nodes are up
 # before computing inverse
 def Reconstruct (list_of_nodes, name):
+    """ Reconstruct the object from the
+        list of nodes provided. Requires
+        at least two nodes.
+    """
 
     list_of_vects = []
     # Find inverse
@@ -125,6 +103,7 @@ def Reconstruct (list_of_nodes, name):
 
 
 def RegenerateWith2Nodes (failed_node, list_of_nodes, name):
+    """Regenerate a node using parts obtained from 2 nodes"""
     
     list_of_vects = []
 
@@ -152,7 +131,15 @@ def RegenerateWith2Nodes (failed_node, list_of_nodes, name):
 
         dist.push_object_to_store (name, failed_node, reduce (numpy.bitwise_xor, pack), arrays_B.index (each))
 
+
+
 def RegenerateWith3Nodes (failed_node, list_of_nodes, name):
+    """ Regenerate a node using parts obtained from 3 nodes.
+        This method works only if:
+          - The failed node is missing one object part.
+          - The nodes to be used for repairing collectively have at least
+            three basis vectors that do not include the missing part.
+    """
 
     # Obtain index of an object which isn't
     # required to repair the failed node
@@ -197,20 +184,30 @@ def RegenerateWith3Nodes (failed_node, list_of_nodes, name):
             list_of_objects.append (dist.pull_object_from_stores (name, node_index, object_index))
     
     # Now we have the reduced matrix (3x3 for this case)
-    # SOLVE!
+    # Solve the linear equations!
     for tup in basis_vectors_of_failed_node:
         each = tup[:pos] + tup[pos+1:]
         res = numpy.linalg.solve (numpy.array(array_A).transpose(), numpy.array(each).transpose())
 
+        # Select the object-parts that need to
+        # be XOR-ed together to reconstruct
+        # the corresponding part
         pack = []
-
         for i in range (0, len(res)):
             if (res[i] != 0):
                 pack.append (copy.deepcopy (list_of_objects[i]))
 
+        # XOR the parts together
+        # and push to repository
         dist.push_object_to_store (name, failed_node, reduce (numpy.bitwise_xor, pack), basis_vectors_of_failed_node.index (tup))
 
+
+
 def Regenerate (failed_node, list_of_nodes, name):
+    """ If the 3-node-repair doesn't include
+        the special case of the missing bit, then
+        fallback to 2-node repair
+    """
     if (len(list_of_nodes) == 2):
         RegenerateWith2Nodes (failed_node, list_of_nodes, name)
     elif (len(list_of_nodes) == 3):
@@ -224,7 +221,7 @@ def Regenerate (failed_node, list_of_nodes, name):
 if __name__ == "__main__":    
 
     global meta
-    meta = metastore.MetaStore ()
+    meta = meta_store.MetaStore ()
 
     strip = Strip()
     name = sys.argv[1]
@@ -235,7 +232,7 @@ if __name__ == "__main__":
     i = 0
     storage_obj_list = []
     for each in chunks:
-        so = StorageObject (each, i, name)
+        so = storage_object.StorageObject (each, i, name)
         storage_obj_list.append (so)
         i += 1
 

@@ -34,6 +34,21 @@ class Menu(cmd.Cmd):
            reg_inst.name = name
            shutil.rmtree(str(conf.DIRS[failed_node])) #TODO  copy dir struct from do_clean
     
+    def do_test (self, line):
+        """ tests all possible combinations for regeneration"""
+        file = line.split()[0]
+        monitor.stop()
+        #Testing for 3 nodes
+        import itertools
+        for nodes in list(itertools.permutations(range(0,len(conf.DIRS)), 4)):
+                            print nodes
+                            failed,node1,node2,node3 = (nodes[0], nodes[1], nodes[2], nodes[3])
+                            print failed, node1,node2,node3
+                            shutil.rmtree(str(conf.DIRS[failed]))
+                            reg_inst.regen_from = [node1,node2,node3]
+                            reg_inst.name = file
+                            monitor.scan (map (lambda x: conf.DIRS[x], [node1,node2,node3]))
+                            monitor.stop()
     def md5func (self,filename):
         md5 = hashlib.md5()
         with open(filename,'rb') as f:

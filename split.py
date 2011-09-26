@@ -110,7 +110,6 @@ def Reconstruct (list_of_nodes, name):
 def RegenerateWith2Nodes (failed_node, list_of_nodes, name):
     """Regenerate a node using parts obtained from 2 nodes"""
     
-    print failed_node, list_of_nodes, name
     list_of_vects = []
 
     for node_index in list_of_nodes:
@@ -146,7 +145,6 @@ def RegenerateWith3Nodes (failed_node, list_of_nodes, name):
           - The nodes to be used for repairing collectively have at least
             three basis vectors that do not include the missing part.
     """
-
     # Obtain index of an object which isn't
     # required to repair the failed node
     basis_vectors_of_failed_node = conf.BASIS_VECTORS [failed_node]
@@ -214,14 +212,13 @@ def Regenerate (failed_node, list_of_nodes, name):
         the special case of the missing bit, then
         fallback to 2-node repair
     """
-    print failed_node,list_of_nodes,name
     if (len(list_of_nodes) == 2):
         RegenerateWith2Nodes (failed_node, list_of_nodes, name)
     elif (len(list_of_nodes) == 3):
         try:
             RegenerateWith3Nodes (failed_node, list_of_nodes, name)
         except:
-            print "Falling back to 2 nodes"
+            print "Falling back to 2 nodes, failed_node: %s, list_of_nodes: %s" % (failed_node, list_of_nodes)
             RegenerateWith2Nodes (failed_node, list_of_nodes[:-1], name)
 
 

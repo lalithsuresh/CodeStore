@@ -40,7 +40,6 @@ class Distributor:
 
     def push_object_to_store(self, name, node_index, obj, object_index):
 
-        print name, node_index, object_index
         path = os.path.abspath(conf.DIRS[node_index])
 
         # For each tuple to be saved...

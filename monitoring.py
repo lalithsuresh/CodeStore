@@ -13,7 +13,7 @@ class Monitoring:
         self.has_started = False
         self.reg =regen
 
-    def scan (self, list_of_nodes=conf.DIRS):
+    def force_scan (self, list_of_nodes=conf.DIRS):
         for node in list_of_nodes:
             if (os.path.exists (os.path.abspath(node))):
                 self.information_map[os.path.abspath(node)] = "UP"
@@ -25,6 +25,9 @@ class Monitoring:
                     if e.errno != errno.EEXIST:
                         raise
                 split.Regenerate (list_of_nodes.index (node), self.reg.regen_from, self.reg.name)
+
+    def scan (self, list_of_nodes=conf.DIRS):
+        self.force_scan (list_of_nodes) 
         self.timer = threading.Timer (conf.MONITORING_INTERVAL, self.scan)
         self.timer.start()
 

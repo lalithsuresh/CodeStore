@@ -33,20 +33,24 @@ class Menu(cmd.Cmd):
            reg_inst.regen_from = list_of_nodes
            reg_inst.name = name
            shutil.rmtree(str(conf.DIRS[failed_node])) #TODO  copy dir struct from do_clean
+    
+    def md5func (self,filename):
+        md5 = hashlib.md5()
+        with open(filename,'rb') as f:
+            for chunk in iter(lambda: f.read(128*md5.block_size), ''): 
+                 md5.update(chunk)
+            f.close()
+            return md5.hexdigest()
+    
     def do_md5 (self,line):
+        """ md5 filename
+        Returns an md5 hash between filename and 'reconstructed-output.mp3'"""
+        
         file_name = line.split()[0]
-        md5f1 = hashlib.md5()
-        md5f2 = hashlib.md5()
-        with open(file_name,'rb') as f1:
-            for chunk in iter(lambda: f1.read(128*md5f1.block_size), ''): 
-                 md5f1.update(chunk)
-            print md5f1.hexdigest(),f1.name
-            f1.close()
-        with open('reconstructed-output.mp3','rb') as f2:
-            for c in iter(lambda: f2.read(128*md5f2.block_size), ''): 
-                 md5f2.update(c)
-            print md5f2.hexdigest(),f2.name
-            f2.close()
+        
+        print self.md5func (file_name), file_name
+        print self.md5func ('reconstructed-output.mp3'),'reconstructed-output.mp3'
+    
     def do_init(self,name):
         """ init name 
             Initialize the file specified by and analyze Basis Vectors.
@@ -58,6 +62,7 @@ class Menu(cmd.Cmd):
     
     def do_exit(self,name):
         """exit"""
+        monitor.stop()
         return True
     
     def do_clean(self,name):

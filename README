@@ -24,39 +24,47 @@ Commands
 Once inside the prompt there are several commands to execute
     
     (Cmd) init Filename
-    Splits the file into parts by applying the basis vectors and the xor operations where needed.
-    It also starts a monitor service which takes care of regeneration
+    Splits the file into parts by applying the basis vectors and the xor operations 
+    where needed. It also starts a monitor service which takes care of regeneration.
     
     (Cmd) regenerate Filename FailedNode node1 node2 [node3]
-    Regenerate using 2 or 3 nodes (if possible). 
-    To reconstruct using 2 nodes, we use the basis vectors to solve a sys of linear equations.
-    Thus, we determine which parts to pull from the nodes, and how to combine them for regenerate the missing objects
-    When using 3 nodes, by looking at the basis vectors of the Failed node, we can determine which bit is not set. 
-    If this is possible then, we can regenerate by using only 3 vectors from 3 different nodes in the list, given these vectors do not have the missing bit set in them.
-    Only when it is not possible to find these vectors, we fall back and reconstruct by using 4 parts from 2 nodes.
+    Regenerate using 2 or 3 nodes (if possible). To regenerate using 2 nodes, we 
+    use the basis vectors to solve a system of linear equations. Thus, we determine 
+    which parts to pull from the nodes, and how to combine them to regenerate the 
+    missing objects. When using 3 nodes, by looking at the basis vectors of the 
+    failed node, we can determine which bit is not set. If such a situation exists, 
+    we can regenerate by using only 3 parts from 3 different nodes in the list, 
+    given these vectors do not have the same missing bit set in them. Only when it 
+    is not possible to find such a set of vectors, we fall back and repair the node 
+    by using 4 parts from 2 nodes.
     
     (Cmd) reconstruct Filename node1 node2
-    We reconstruct the object by fetching 4 parts from 2 nodes and finding the inverse of the matrix formed by the basis vectors of the nodes.
-    The output file generated is 'reconstructed-output.mp3'
+    We reconstruct the object by fetching 4 parts from 2 nodes and finding the inverse 
+    of the matrix formed by the basis vectors of the nodes. The output file generated 
+    is 'reconstructed-output.mp3'
     
     (Cmd) test Filename
-    Tests all possible combinations of the regenerate function using 3 nodes to reconstruct. It shows that in 58% of the cases it is possible to reconstruct using 3 nodes
-    by using the our method of detecting the unused bit in the failed node.
+    Tests all possible combinations of the regenerate function using 3 nodes to reconstruct.
+    For the basis vectors specified in conf.py, in 58% of the cases it is possible to 
+    reconstruct using 3 nodes by using the our method of detecting the unused bit in the 
+    failed node.
 
     (Cmd) stats
     Print stats from the monitoring service that detects the failure of nodes
 
     (Cmd) clean Filename
-    Clean all parts corresponding to that file from the directories and also delete 'reconstructed-output.mp3'
+    Dletes all parts corresponding to that file from the directories and also deletes 
+    'reconstructed-output.mp3'
 
     (Cmd) exit
     Exit the shell
     
+
 TODO
 ----
-- Support remote peers.
-- Peers should talk to each other for node repair.
-- Support joining of a new node.
+- Padding of file chunks (use meta_store.py)
+- In cases where our unused-bit-technique doesn't apply, try explorative search instead
+  of using 4 parts to reconstruct the object.
 
 
 Credits

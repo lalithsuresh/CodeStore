@@ -72,17 +72,3 @@ class Distributor:
 
         arr = numpy.array (map(lambda x: ord(x), data))
         return arr
-
-
-
-if __name__ == "__main__":
-    dist = Distributer()
-    #dist.create_dirs() 
-    #dist.push_objects_to_stores('objectA', [[1,2],[3,4],[5,6],[7,8]])
-    #dist.push_objects_to_stores('objectB', [[2,1],[4,3],[6,5],[8,7]])
-    try:
-        print dist.pull_objects_from_stores('objectB', 3)
-    except Exception as inst:
-        print inst.args
-
-    print dist.pull_objects_from_stores('objectA', 2)

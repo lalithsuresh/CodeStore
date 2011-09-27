@@ -12,13 +12,46 @@ vectors for the SRC are to be fed as a configuration parameter.
 It has been tested against a (5,2) PSRC code for now. Hopefully,
 the same code works with other codes as well. :)
 
+Python 2.7 is required to run the application
 
 Running the code
 ----------------
 
-$: ./split.py <file-to-be-split>
+$: ./menu.py 
 
+Commands
+---------
+Once inside the prompt there are several commands to execute
+    
+    (Cmd) init Filename
+    Splits the file into parts by applying the basis vectors and the xor operations where needed.
+    It also starts a monitor service which takes care of regeneration
+    
+    (Cmd) regenerate Filename FailedNode node1 node2 [node3]
+    Regenerate using 2 or 3 nodes (if possible). 
+    To reconstruct using 2 nodes, we use the basis vectors to solve a sys of linear equations.
+    Thus, we determine which parts to pull from the nodes, and how to combine them for regenerate the missing objects
+    When using 3 nodes, by looking at the basis vectors of the Failed node, we can determine which bit is not set. 
+    If this is possible then, we can regenerate by using only 3 vectors from 3 different nodes in the list, given these vectors do not have the missing bit set in them.
+    Only when it is not possible to find these vectors, we fall back and reconstruct by using 4 parts from 2 nodes.
+    
+    (Cmd) reconstruct Filename node1 node2
+    We reconstruct the object by fetching 4 parts from 2 nodes and finding the inverse of the matrix formed by the basis vectors of the nodes.
+    The output file generated is 'reconstructed-output.mp3'
+    
+    (Cmd) test Filename
+    Tests all possible combinations of the regenerate function using 3 nodes to reconstruct. It shows that in 58% of the cases it is possible to reconstruct using 3 nodes
+    by using the our method of detecting the unused bit in the failed node.
 
+    (Cmd) stats
+    Print stats from the monitoring service that detects the failure of nodes
+
+    (Cmd) clean Filename
+    Clean all parts corresponding to that file from the directories and also delete 'reconstructed-output.mp3'
+
+    (Cmd) exit
+    Exit the shell
+    
 TODO
 ----
 - Support remote peers.
